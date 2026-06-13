@@ -11,7 +11,7 @@ ALLOWED_ORIGIN = "https://zizou11a.github.io"  # غيّر هذا لدومينك
 # ثم انسخ الـ id هنا
 [[kv_namespaces]]
 binding = "RATE_LIMIT_KV"
-id      = "PASTE_YOUR_KV_ID_HERE"
+id      = "c4099251ce9a45c99481805798af741c"
 
 # للتطوير المحلي (preview)
 # preview_id = "PASTE_YOUR_PREVIEW_KV_ID_HERE"
