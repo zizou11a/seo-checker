@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SEO Checker - فحص موقعك مجاناً</title>
+  <meta name="description" content="أداة فحص SEO مجانية - تحليل شامل لموقعك وتحسين ترتيبك في محركات البحث" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #0a0e1a;
+      --surface:   #111827;
+      --border:    #1e2d45;
+      --accent:    #00d4ff;
+      --accent2:   #7c3aed;
+      --success:   #10b981;
+      --warning:   #f59e0b;
+      --danger:    #ef4444;
+      --text:      #e2e8f0;
+      --muted:     #64748b;
+      --card:      #131c2e;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Cairo', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── GRID BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(10,14,26,.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .9rem;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 5rem 1rem 3rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(0,212,255,.1);
+      border: 1px solid rgba(0,212,255,.25);
+      color: var(--accent);
+      font-size: .78rem;
+      padding: .3rem .9rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+      letter-spacing: .5px;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+
+    h1 span {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    /* ── CHECKER BOX ── */
+    .checker-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      margin: 0 auto 4rem;
+      padding: 0 1rem;
+    }
+
+    .checker-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 0 60px rgba(0,212,255,.06);
+    }
+
+    .input-row {
+      display: flex;
+      gap: .75rem;
+      margin-bottom: 1rem;
+    }
+
+    .url-input {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .85rem 1.1rem;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      direction: ltr;
+    }
+
+    .url-input::placeholder { color: var(--muted); }
+    .url-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,212,255,.1);
+    }
+
+    .btn-check {
+      background: linear-gradient(135deg, var(--accent), #0099cc);
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      padding: .85rem 1.6rem;
+      font-family: 'Cairo', sans-serif;
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity .2s, transform .15s;
+    }
+
+    .btn-check:hover { opacity: .9; transform: translateY(-1px); }
+    .btn-check:active { transform: translateY(0); }
+    .btn-check:disabled { opacity: .5; cursor: not-allowed; }
+
+    .options-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .83rem;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox-label input[type=checkbox] {
+      accent-color: var(--accent);
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ── PROGRESS ── */
+    #progressSection {
+      display: none;
+      margin-top: 1.5rem;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: .82rem;
+      color: var(--muted);
+      margin-bottom: .5rem;
+    }
+
+    .progress-bar-wrap {
+      background: var(--card);
+      border-radius: 999px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 999px;
+      transition: width .4s ease;
+      width: 0%;
+    }
+
+    .scan-steps {
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-size: .82rem;
+      color: var(--muted);
+      transition: color .3s;
+    }
+
+    .step-item.active { color: var(--accent); }
+    .step-item.done   { color: var(--success); }
+
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+      transition: background .3s;
+    }
+
+    .step-item.active .step-dot { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+    .step-item.done   .step-dot { background: var(--success); }
+
+    /* ── RESULTS ── */
+    #resultsSection { display: none; margin-top: 2rem; }
+
+    .score-ring-wrap {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .score-ring {
+      position: relative;
+      display: inline-block;
+      width: 140px;
+      height: 140px;
+    }
+
+    .score-ring svg {
+      transform: rotate(-90deg);
+    }
+
+    .score-ring .score-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .score-number {
+      font-size: 2.2rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: .7rem;
+      color: var(--muted);
+      margin-top: .2rem;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      transition: border-color .2s;
+    }
+
+    .metric-card:hover { border-color: rgba(0,212,255,.3); }
+
+    .metric-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: .5rem;
+    }
+
+    .metric-name {
+      font-size: .8rem;
+      color: var(--muted);
+    }
+
+    .metric-badge {
+      font-size: .7rem;
+      padding: .15rem .5rem;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    .badge-good    { background: rgba(16,185,129,.15); color: var(--success); }
+    .badge-warning { background: rgba(245,158,11,.15); color: var(--warning); }
+    .badge-error   { background: rgba(239,68,68,.15);  color: var(--danger); }
+
+    .metric-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    /* ── ISSUES LIST ── */
+    .issues-section h3 {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .issue-item {
+      display: flex;
+      align-items: flex-start;
+      gap: .75rem;
+      padding: .85rem 1rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: .6rem;
+      transition: border-color .2s;
+    }
+
+    .issue-item:hover { border-color: rgba(255,255,255,.1); }
+
+    .issue-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      font-size: .9rem;
+    }
+
+    .issue-body { flex: 1; }
+
+    .issue-title {
+      font-size: .88rem;
+      font-weight: 600;
+      margin-bottom: .2rem;
+    }
+
+    .issue-desc {
+      font-size: .78rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── STATS ── */
+    .stats-bar {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 2rem 1rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin: 3rem 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat { text-align: center; }
+    .stat-num {
+      font-size: 1.8rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-desc { font-size: .8rem; color: var(--muted); margin-top: .2rem; }
+
+    /* ── FEATURES ── */
+    .features {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto 4rem;
+      padding: 0 1rem;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      transition: border-color .2s, transform .2s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(0,212,255,.25);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      font-size: 1.8rem;
+      margin-bottom: .8rem;
+    }
+
+    .feature-title {
+      font-size: .95rem;
+      font-weight: 700;
+      margin-bottom: .4rem;
+    }
+
+    .feature-desc {
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ── INPUT VALIDATION ── */
+    .url-input.input-error {
+      border-color: var(--danger) !important;
+      box-shadow: 0 0 0 3px rgba(239,68,68,.15) !important;
+    }
+    .url-input.input-ok {
+      border-color: var(--success);
+      box-shadow: 0 0 0 3px rgba(16,185,129,.1);
+    }
+
+    .validation-msg {
+      display: none;
+      align-items: center;
+      gap: .4rem;
+      font-size: .8rem;
+      margin-top: .5rem;
+      padding: .45rem .75rem;
+      border-radius: 8px;
+      animation: fadeIn .2s ease;
+    }
+    .validation-msg.show { display: flex; }
+    .validation-msg.msg-error   { background: rgba(239,68,68,.1);  color: #fca5a5; border: 1px solid rgba(239,68,68,.25); }
+    .validation-msg.msg-warning { background: rgba(245,158,11,.1); color: #fcd34d; border: 1px solid rgba(245,158,11,.25); }
+    .validation-msg.msg-ok      { background: rgba(16,185,129,.1); color: #6ee7b7; border: 1px solid rgba(16,185,129,.25); }
+
+    /* URL preview chip */
+    .url-preview {
+      display: none;
+      align-items: center;
+      gap: .5rem;
+      margin-top: .6rem;
+      padding: .4rem .75rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .75rem;
+      color: var(--muted);
+      direction: ltr;
+    }
+    .url-preview.show { display: flex; }
+    .url-preview .preview-protocol { color: var(--success); }
+    .url-preview .preview-host     { color: var(--text); font-weight: 600; }
+    .url-preview .preview-path     { color: var(--muted); }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes shake  {
+      0%,100% { transform: translateX(0); }
+      20%     { transform: translateX(-6px); }
+      40%     { transform: translateX(6px); }
+      60%     { transform: translateX(-4px); }
+      80%     { transform: translateX(4px); }
+    }
+    .shake { animation: shake .35s ease; }
+
+    /* ════════════════════════════════════════
+       MOBILE — شامل ومتدرج
+    ════════════════════════════════════════ */
+
+    /* ── تحسين عام للمس ── */
+    button, .checkbox-label, .nav-links a {
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    /* حجم الخط الأدنى لتجنب zoom على iOS */
+    input, button, select, textarea { font-size: max(16px, 1em); }
+
+    /* ── 768px — تابلت ── */
+    @media (max-width: 768px) {
+      .results-grid  { grid-template-columns: repeat(2, 1fr); }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-bar     { gap: 1.2rem; }
+    }
+
+    /* ── 600px — جوال كبير ── */
+    @media (max-width: 600px) {
+      /* Nav */
+      nav { padding: .75rem 1rem; }
+      .nav-links { display: none; }
+
+      /* قائمة جوال منسدلة */
+      .mobile-menu {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        background: rgba(10,14,26,.97);
+        backdrop-filter: blur(16px);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+      }
+      .mobile-menu.open { display: flex; }
+      .mobile-menu a {
+        color: var(--text);
+        text-decoration: none;
+        font-size: 1.4rem;
+        font-weight: 700;
+      }
+      .mobile-menu .close-btn {
+        position: absolute;
+        top: 1.2rem;
+        left: 1.2rem;
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-size: 1.6rem;
+        cursor: pointer;
+        padding: .5rem;
+      }
+      .hamburger {
+        display: flex !important;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: .4rem;
+      }
+      .hamburger span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background: var(--text);
+        border-radius: 2px;
+        transition: .3s;
+      }
+
+      /* Hero */
+      h1 { font-size: 1.7rem; line-height: 1.25; }
+      .hero { padding: 3rem 1rem 2rem; }
+      .subtitle { font-size: .92rem; }
+      .badge { font-size: .73rem; }
+
+      /* Checker box */
+      .checker-box { padding: 1.2rem; }
+      .input-row { flex-direction: column; gap: .6rem; }
+      .url-input  { padding: .95rem 1rem; font-size: 1rem !important; }
+      .btn-check  {
+        width: 100%;
+        padding: .95rem;
+        font-size: 1rem !important;
+        border-radius: 10px;
+      }
+
+      /* Options row */
+      .options-row { gap: .6rem; }
+      .checkbox-label { font-size: .82rem; }
+
+      /* Score */
+      .score-ring { width: 120px; height: 120px; }
+      .score-ring svg { width: 120px; height: 120px; }
+      .score-number { font-size: 1.8rem; }
+
+      /* Results grid */
+      .results-grid { grid-template-columns: 1fr 1fr; gap: .7rem; }
+      .metric-card  { padding: .8rem; }
+      .metric-name  { font-size: .72rem; }
+      .metric-value { font-size: .9rem !important; }
+
+      /* Issues */
+      .issue-item { padding: .75rem; gap: .5rem; }
+      .issue-title { font-size: .83rem; }
+      .issue-desc  { font-size: .74rem; }
+
+      /* Stats */
+      .stats-bar { gap: 1rem; padding: 1.5rem 1rem; }
+      .stat-num  { font-size: 1.4rem; }
+      .stat-desc { font-size: .72rem; }
+
+      /* Features */
+      .features { padding: 0 .75rem; }
+      .features-grid { grid-template-columns: 1fr; gap: .9rem; }
+      .feature-card  { padding: 1.1rem; }
+    }
+
+    /* ── 380px — جوال صغير ── */
+    @media (max-width: 380px) {
+      h1 { font-size: 1.4rem; }
+      .results-grid { grid-template-columns: 1fr; }
+      .score-number { font-size: 1.5rem; }
+    }
+
+    /* ── Safe area لأجهزة الشق (iPhone X+) ── */
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      footer {
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">⚡ SEO Check</div>
+    <ul class="nav-links">
+      <li><a href="#">الرئيسية</a></li>
+      <li><a href="#">الميزات</a></li>
+      <li><a href="#">الأسعار</a></li>
+      <li><a href="#">المدونة</a></li>
+    </ul>
+    <!-- Hamburger — يظهر فقط على الجوال -->
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleMenu()" aria-label="القائمة" style="display:none">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE MENU OVERLAY -->
+  <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true">
+    <button class="close-btn" onclick="toggleMenu()" aria-label="إغلاق">✕</button>
+    <a href="#" onclick="toggleMenu()">الرئيسية</a>
+    <a href="#" onclick="toggleMenu()">الميزات</a>
+    <a href="#" onclick="toggleMenu()">الأسعار</a>
+    <a href="#" onclick="toggleMenu()">المدونة</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="badge">🚀 مجاني 100% — لا يحتاج تسجيل</div>
+    <h1>فحص موقعك <span>SEO</span><br/>واكتشف مشاكله الآن</h1>
+    <p class="subtitle">
+      تحليل شامل لأكثر من 200 عامل تحسين محركات البحث — سرعة، محتوى، روابط، وأمان.
+      احصل على تقرير مفصل في ثوانٍ.
+    </p>
+  </section>
+
+  <!-- CHECKER -->
+  <div class="checker-wrap">
+    <div class="checker-box">
+      <div class="input-row">
+        <input
+          id="urlInput"
+          type="url"
+          class="url-input"
+          placeholder="https://example.com"
+          value=""
+          dir="ltr"
+        />
+        <button class="btn-check" id="checkBtn" onclick="startCheck()">
+          فحص الآن →
+        </button>
+      </div>
+
+      <!-- Validation feedback -->
+      <div id="validationMsg" class="validation-msg"></div>
+      <div id="urlPreview" class="url-preview" dir="ltr">
+        <span class="preview-protocol" id="previewProtocol"></span>
+        <span>//</span>
+        <span class="preview-host" id="previewHost"></span>
+        <span class="preview-path" id="previewPath"></span>
+      </div>
+
+      <div class="options-row">
+        <label class="checkbox-label">
+          <input type="checkbox" checked /> فحص الأداء
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" checked /> فحص المحتوى
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" checked /> فحص الروابط
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" checked /> فحص الأمان
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" /> فحص Mobile
+        </label>
+      </div>
+
+      <!-- PROGRESS -->
+      <div id="progressSection">
+        <div style="margin: 1.2rem 0 .5rem; font-size: .85rem; font-weight: 600;">جاري الفحص...</div>
+        <div class="progress-label">
+          <span id="progressText">تهيئة...</span>
+          <span id="progressPct">0%</span>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="scan-steps" id="scanSteps"></div>
+      </div>
+
+      <!-- RESULTS -->
+      <div id="resultsSection">
+        <hr style="border:none;border-top:1px solid var(--border);margin:1.5rem 0" />
+
+        <!-- SCORE RING -->
+        <div class="score-ring-wrap">
+          <div class="score-ring">
+            <svg viewBox="0 0 120 120" width="140" height="140">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="10"/>
+              <circle id="scoreCircle" cx="60" cy="60" r="50" fill="none"
+                stroke="url(#scoreGrad)" stroke-width="10"
+                stroke-linecap="round"
+                stroke-dasharray="314"
+                stroke-dashoffset="314"
+                style="transition:stroke-dashoffset 1s ease"/>
+              <defs>
+                <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#00d4ff"/>
+                  <stop offset="100%" stop-color="#7c3aed"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="score-text">
+              <div class="score-number" id="scoreNumber">0</div>
+              <div class="score-label">نقطة / 100</div>
+            </div>
+          </div>
+          <div style="margin-top:.6rem;font-size:.85rem;color:var(--muted)" id="scoreSummary"></div>
+        </div>
+
+        <!-- METRICS -->
+        <div class="results-grid" id="metricsGrid"></div>
+
+        <!-- ISSUES -->
+        <div class="issues-section" id="issuesSection"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-num">200+</div>
+      <div class="stat-desc">معيار فحص</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">50K+</div>
+      <div class="stat-desc">موقع محلل</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">0.5s</div>
+      <div class="stat-desc">متوسط وقت الفحص</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">100%</div>
+      <div class="stat-desc">مجاني دائماً</div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <h2 class="section-title">ماذا يفحص؟</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🏷️</div>
+        <div class="feature-title">Meta Tags & HTML</div>
+        <div class="feature-desc">Title، Description، H1-H6، Alt للصور، وكل العناصر التقنية</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">سرعة الأداء</div>
+        <div class="feature-desc">Core Web Vitals: LCP، FID، CLS — والعوامل المؤثرة عليها</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔗</div>
+        <div class="feature-title">الروابط الداخلية والخارجية</div>
+        <div class="feature-desc">روابط مكسورة، nofollow، redirect chains، وهيكل الـ Internal linking</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <div class="feature-title">Mobile Friendly</div>
+        <div class="feature-desc">Viewport، حجم النص، عناصر قابلة للنقر، وتوافق الشاشات الصغيرة</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title">الأمان</div>
+        <div class="feature-desc">HTTPS، Mixed Content، HSTS، وشهادة SSL</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🗺️</div>
+        <div class="feature-title">Structured Data</div>
+        <div class="feature-desc">Schema.org، JSON-LD، OpenGraph، Twitter Cards</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>SEO Check — مبني بـ ❤️ | مفتوح المصدر على <a href="https://github.com" target="_blank">GitHub</a></p>
+  </footer>
+
+  <script>
+    // ══════════════════════════════════════════
+    //  CONFIG — غيّر هذا بعد نشر الـ Worker
+    // ══════════════════════════════════════════
+    const WORKER_URL = 'https://seo-checker.YOUR_SUBDOMAIN.workers.dev';
+
+    const STEPS = [
+      { id: 'dns',      label: 'فحص DNS والاتصال' },
+      { id: 'html',     label: 'تحليل HTML والميتا تاجز' },
+      { id: 'content',  label: 'فحص المحتوى والكلمات المفتاحية' },
+      { id: 'links',    label: 'فحص الروابط الداخلية والخارجية' },
+      { id: 'images',   label: 'فحص الصور والـ Alt Text' },
+      { id: 'perf',     label: 'قياس أداء الصفحة' },
+      { id: 'mobile',   label: 'اختبار التوافق مع الجوال' },
+      { id: 'security', label: 'فحص الأمان والـ HTTPS' },
+    ];
+
+    const CHECK_LABELS = {
+      title:           'Title Tag',
+      metaDescription: 'Meta Description',
+      h1:              'H1 Tag',
+      https:           'HTTPS',
+      viewport:        'Viewport / الجوال',
+      images:          'Alt Text للصور',
+      canonical:       'Canonical URL',
+      robotsTxt:       'Robots.txt',
+      sitemap:         'Sitemap.xml',
+      openGraph:       'Open Graph',
+      structuredData:  'Structured Data',
+      lang:            'HTML Lang',
+      wordCount:       'عدد الكلمات',
+    };
+
+    // ══════════════════════════════════════════
+    //  INPUT VALIDATION
+    // ══════════════════════════════════════════
+
+    // الأنماط المحظورة — شبكة داخلية
+    const BLOCKED = /^(localhost|127\.\d+\.\d+\.\d+|10\.\d+\.\d+\.\d+|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|0\.0\.0\.0)/i;
+    // امتدادات ملفات لا معنى لفحصها
+    const FILE_EXTS = /\.(pdf|zip|rar|exe|dmg|apk|jpg|jpeg|png|gif|svg|mp4|mp3|csv|xlsx|docx)$/i;
+
+    /**
+     * يُرجع { ok, warning, error, normalized, parsed }
+     * ok      = جاهز للإرسال
+     * warning = يمكن الإرسال لكن فيه تحذير
+     * error   = لا يمكن الإرسال
+     */
+    function validateUrl(raw) {
+      const trimmed = raw.trim();
+
+      // فارغ
+      if (!trimmed) return { state: 'empty', message: '' };
+
+      // أحرف غير مسموحة (XSS/injection protection)
+      if (/[<>"'`]/.test(trimmed)) {
+        return { state: 'error', message: '⛔ الرابط يحتوي على أحرف غير مسموحة' };
+      }
+
+      // حد أقصى للطول
+      if (trimmed.length > 2048) {
+        return { state: 'error', message: '⛔ الرابط طويل جداً (الحد 2048 حرف)' };
+      }
+
+      // نضيف https:// إذا غائب للتحقق
+      const withProto = /^https?:\/\//i.test(trimmed) ? trimmed : 'https://' + trimmed;
+
+      let parsed;
+      try {
+        parsed = new URL(withProto);
+      } catch {
+        // ليس URL حتى الآن — ربما المستخدم لا يزال يكتب
+        const looksLikeDomain = /^[\w-]+(\.[\w-]+)+/.test(trimmed);
+        return looksLikeDomain
+          ? { state: 'typing', message: '' }
+          : { state: 'error', message: '⛔ تأكد من صحة الرابط — مثال: example.com' };
+      }
+
+      // بروتوكول
+      if (!['http:', 'https:'].includes(parsed.protocol)) {
+        return { state: 'error', message: `⛔ البروتوكول "${parsed.protocol}" غير مدعوم — استخدم http أو https` };
+      }
+
+      // شبكة داخلية
+      if (BLOCKED.test(parsed.hostname)) {
+        return { state: 'error', message: '⛔ لا يمكن فحص عناوين الشبكة الداخلية' };
+      }
+
+      // IP مباشر (بدون دومين)
+      if (/^\d{1,3}(\.\d{1,3}){3}$/.test(parsed.hostname)) {
+        return { state: 'warning', message: '⚠️ تفحص عنوان IP مباشرة — النتائج قد تكون محدودة', normalized: withProto, parsed };
+      }
+
+      // امتداد ملف
+      if (FILE_EXTS.test(parsed.pathname)) {
+        return { state: 'error', message: '⛔ هذا رابط ملف وليس صفحة ويب' };
+      }
+
+      // تحذير: HTTP بدون S
+      if (parsed.protocol === 'http:') {
+        return { state: 'warning', message: '⚠️ الموقع يستخدم HTTP — سيظهر كمشكلة في نتائج الفحص', normalized: withProto, parsed };
+      }
+
+      // ✅ صالح
+      return { state: 'ok', message: '✓ رابط صالح', normalized: withProto, parsed };
+    }
+
+    function showValidation(state, message) {
+      const msg   = document.getElementById('validationMsg');
+      const input = document.getElementById('urlInput');
+
+      // أزل الكلاسات القديمة
+      msg.className = 'validation-msg';
+      input.classList.remove('input-error', 'input-ok');
+
+      if (!message) { msg.classList.remove('show'); return; }
+
+      msg.textContent = message;
+      msg.classList.add('show');
+
+      if (state === 'error') {
+        msg.classList.add('msg-error');
+        input.classList.add('input-error');
+      } else if (state === 'warning') {
+        msg.classList.add('msg-warning');
+      } else if (state === 'ok') {
+        msg.classList.add('msg-ok');
+        input.classList.add('input-ok');
+      }
+    }
+
+    function showUrlPreview(parsed) {
+      const wrap = document.getElementById('urlPreview');
+      if (!parsed) { wrap.classList.remove('show'); return; }
+      document.getElementById('previewProtocol').textContent = parsed.protocol + '//';
+      document.getElementById('previewHost').textContent     = parsed.hostname;
+      document.getElementById('previewPath').textContent     = parsed.pathname !== '/' ? parsed.pathname : '';
+      wrap.classList.add('show');
+    }
+
+    // Live validation أثناء الكتابة
+    let debounceTimer;
+    document.getElementById('urlInput').addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        const raw    = document.getElementById('urlInput').value;
+        const result = validateUrl(raw);
+        if (result.state === 'empty' || result.state === 'typing') {
+          showValidation('', '');
+          showUrlPreview(null);
+        } else {
+          showValidation(result.state, result.message);
+          showUrlPreview(result.parsed ?? null);
+        }
+      }, 350); // debounce 350ms
+    });
+
+    // ── ENTRY POINT ──
+    async function startCheck() {
+      const raw    = document.getElementById('urlInput').value;
+      const result = validateUrl(raw);
+
+      // إذا كانت مشكلة — أظهر الخطأ وهزّ الـ input
+      if (result.state === 'error' || result.state === 'empty' || result.state === 'typing') {
+        const errorMsg = result.state === 'empty'
+          ? '⛔ أدخل رابط الموقع أولاً'
+          : result.state === 'typing'
+          ? '⛔ أكمل كتابة الرابط — مثال: example.com'
+          : result.message;
+        showValidation('error', errorMsg);
+        const input = document.getElementById('urlInput');
+        input.classList.add('shake');
+        input.addEventListener('animationend', () => input.classList.remove('shake'), { once: true });
+        input.focus();
+        return;
+      }
+
+      const url = result.normalized;
+
+      // أظهر preview قبل البدء
+      showUrlPreview(result.parsed);
+      showValidation(result.state, result.message);
+
+      const btn = document.getElementById('checkBtn');
+      btn.disabled = true;
+      btn.textContent = 'جاري الفحص...';
+
+      document.getElementById('resultsSection').style.display = 'none';
+      document.getElementById('progressSection').style.display = 'block';
+
+      document.getElementById('scanSteps').innerHTML = STEPS.map(s =>
+        `<div class="step-item" id="step-${s.id}"><div class="step-dot"></div><span>${s.label}</span></div>`
+      ).join('');
+
+      let apiData = null;
+      let apiError = null;
+
+      const fetchPromise = fetch(`${WORKER_URL}/check?url=${encodeURIComponent(url)}`)
+        .then(async r => {
+          const data = await r.json();
+          if (r.status === 429) {
+            const retry = r.headers.get('Retry-After') ?? '600';
+            const mins  = Math.ceil(parseInt(retry) / 60);
+            apiData = {
+              error: `تجاوزت الحد المسموح — انتظر ${mins} دقيقة قبل المحاولة`,
+              code: 'RATE_LIMIT',
+              tip: 'الحد الافتراضي هو 10 طلبات كل 10 دقائق لحماية الخدمة.',
+            };
+          } else {
+            apiData = data;
+          }
+        })
+        .catch(e => {
+          // خطأ شبكة — الـ Worker نفسه لا يعمل أو لا يوجد إنترنت
+          apiError = 'تعذّر الوصول إلى خادم الفحص — تأكد من اتصالك بالإنترنت أو أن الـ Worker منشور';
+        });
+
+      let current = 0;
+      await new Promise(resolve => {
+        function advanceStep() {
+          if (current > 0) {
+            document.getElementById(`step-${STEPS[current-1].id}`)?.classList.replace('active','done');
+          }
+          if (current < STEPS.length) {
+            document.getElementById(`step-${STEPS[current].id}`)?.classList.add('active');
+            document.getElementById('progressText').textContent = STEPS[current].label;
+            const pct = Math.round((current / STEPS.length) * 100);
+            document.getElementById('progressPct').textContent = pct + '%';
+            document.getElementById('progressBar').style.width = pct + '%';
+            current++;
+            const delay = current >= STEPS.length - 1 ? 800 : 400 + Math.random() * 300;
+            setTimeout(advanceStep, delay);
+          } else { resolve(); }
+        }
+        setTimeout(advanceStep, 200);
+      });
+
+      await fetchPromise;
+
+      document.getElementById('progressPct').textContent = '100%';
+      document.getElementById('progressBar').style.width = '100%';
+      await new Promise(r => setTimeout(r, 400));
+
+      if (apiError || !apiData || apiData.error) {
+        const msg  = apiData?.error ?? apiError ?? 'حدث خطأ غير متوقع';
+        const tip  = apiData?.tip   ?? '';
+        const code = apiData?.code  ?? '';
+        showError(msg, tip, code);
+        btn.disabled = false;
+        btn.textContent = 'فحص مجدداً →';
+        return;
+      }
+
+      showResults(apiData);
+      btn.disabled = false;
+      btn.textContent = 'فحص مجدداً →';
+    }
+
+    // ── RENDER ERROR ──
+    function showError(msg, tip = '', code = '') {
+      document.getElementById('progressSection').style.display = 'none';
+      document.getElementById('resultsSection').style.display = 'block';
+      document.getElementById('metricsGrid').innerHTML = '';
+      document.getElementById('scoreNumber').textContent = '—';
+      document.getElementById('scoreSummary').textContent = '';
+
+      // Reset score ring
+      document.getElementById('scoreCircle').style.strokeDashoffset = '314';
+      document.getElementById('scoreCircle').style.stroke = 'var(--danger)';
+
+      const iconMap = {
+        TIMEOUT      : '⏱️',
+        DNS_FAIL     : '🔍',
+        SSL_ERROR    : '🔒',
+        CONNECTION   : '🔌',
+        NOT_HTML     : '📄',
+        TOO_LARGE    : '📦',
+        HTTP_ERROR   : '🌐',
+        REDIRECT_LOOP: '🔄',
+        UNKNOWN      : '❓',
+      };
+      const icon = iconMap[code] ?? '❌';
+
+      document.getElementById('issuesSection').innerHTML = `
+        <div style="
+          background: rgba(239,68,68,.07);
+          border: 1px solid rgba(239,68,68,.25);
+          border-radius: 14px;
+          padding: 1.5rem;
+          text-align: center;
+        ">
+          <div style="font-size:2.5rem;margin-bottom:.75rem">${icon}</div>
+          <div style="font-size:1rem;font-weight:700;color:#fca5a5;margin-bottom:.5rem">
+            تعذّر الفحص
+          </div>
+          <div style="font-size:.88rem;color:var(--muted);margin-bottom:${tip ? '1rem' : '0'}">
+            ${msg}
+          </div>
+          ${tip ? `
+          <div style="
+            background: rgba(245,158,11,.08);
+            border: 1px solid rgba(245,158,11,.2);
+            border-radius: 8px;
+            padding: .65rem 1rem;
+            font-size: .82rem;
+            color: #fcd34d;
+            margin-bottom: 1.2rem;
+            text-align: right;
+          ">💡 ${tip}</div>` : ''}
+          <button onclick="startCheck()" style="
+            background: linear-gradient(135deg,var(--accent),#0099cc);
+            color:#000;border:none;border-radius:8px;
+            padding:.65rem 1.4rem;
+            font-family:'Cairo',sans-serif;font-size:.9rem;font-weight:700;
+            cursor:pointer;
+          ">🔄 حاول مجدداً</button>
+        </div>`;
+    }
+
+    // ── RENDER RESULTS ──
+    function showResults(data) {
+      const { score, checks, issues } = data;
+
+      const offset = 314 - (score / 100) * 314;
+      document.getElementById('scoreCircle').style.strokeDashoffset = offset;
+
+      let n = 0;
+      const timer = setInterval(() => {
+        n = Math.min(n + 2, score);
+        document.getElementById('scoreNumber').textContent = n;
+        if (n >= score) clearInterval(timer);
+      }, 20);
+
+      const scoreCircle = document.getElementById('scoreCircle');
+      scoreCircle.style.stroke = score >= 80 ? '#10b981' : score >= 60 ? '#f59e0b' : '#ef4444';
+
+      document.getElementById('scoreSummary').textContent =
+        score >= 80 ? '✅ أداء SEO جيد — بعض التحسينات مقترحة'
+        : score >= 60 ? '⚠️ يحتاج تحسين — هناك مشاكل تؤثر على ترتيبك'
+        : '❌ أداء ضعيف — مشاكل حرجة تحتاج حل فوري';
+
+      document.getElementById('metricsGrid').innerHTML = Object.entries(CHECK_LABELS).map(([key, label]) => {
+        const c = checks[key];
+        if (!c) return '';
+        const val = c.value !== undefined && c.value !== null
+          ? String(c.value).substring(0, 40)
+          : (c.count !== undefined ? c.count + ' عنصر' : c.message.substring(0, 30));
+        return `
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-name">${label}</span>
+              <span class="metric-badge badge-${c.status}">
+                ${c.status === 'good' ? 'جيد' : c.status === 'warning' ? 'تحذير' : 'خطأ'}
+              </span>
+            </div>
+            <div class="metric-value" style="font-size:.95rem;word-break:break-word">${val}</div>
+          </div>`;
+      }).join('');
+
+      const errors   = issues.filter(i => i.severity === 'error');
+      const warnings = issues.filter(i => i.severity === 'warning');
+      const all      = [...errors, ...warnings];
+
+      document.getElementById('issuesSection').innerHTML =
+        `<h3>المشاكل المكتشفة (${all.length} مشكلة)</h3>` +
+        (all.length === 0
+          ? `<div class="issue-item"><div class="issue-icon">🎉</div><div class="issue-body"><div class="issue-title">لا توجد مشاكل!</div><div class="issue-desc">موقعك في حالة ممتازة.</div></div></div>`
+          : all.map(i => `
+            <div class="issue-item">
+              <div class="issue-icon">${i.severity === 'error' ? '❌' : '⚠️'}</div>
+              <div class="issue-body">
+                <div class="issue-title">${CHECK_LABELS[i.key] || i.key}</div>
+                <div class="issue-desc">${i.message}</div>
+              </div>
+            </div>`).join('')
+        );
+
+      const infoHtml = `
+        <div style="margin-top:1rem;padding:.75rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:10px;font-size:.78rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:1rem;direction:ltr">
+          <span>🌐 ${data.finalUrl}</span>
+          <span>📡 HTTP ${data.statusCode}</span>
+          <span>⏱️ ${data.fetchTimeMs}ms</span>
+          ${data.redirected ? '<span>↪️ Redirected</span>' : ''}
+        </div>`;
+      document.getElementById('issuesSection').insertAdjacentHTML('beforeend', infoHtml);
+
+      document.getElementById('resultsSection').style.display = 'block';
+    }
+
+    // ── MOBILE MENU ──
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      const isOpen = menu.classList.toggle('open');
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    }
+
+    // إظهار الهامبرغر فقط على الجوال
+    function updateNav() {
+      const hamburger = document.getElementById('hamburgerBtn');
+      hamburger.style.display = window.innerWidth <= 600 ? 'flex' : 'none';
+    }
+    updateNav();
+    window.addEventListener('resize', updateNav);
+
+    // إغلاق القائمة عند الضغط خارجها
+    document.getElementById('mobileMenu').addEventListener('click', function(e) {
+      if (e.target === this) toggleMenu();
+    });
+
+    // ── تحسين لوحة مفاتيح الجوال ──
+    // نوع inputmode=url يفتح لوحة مفاتيح مناسبة للروابط
+    document.getElementById('urlInput').setAttribute('inputmode', 'url');
+    document.getElementById('urlInput').setAttribute('autocomplete', 'url');
+    document.getElementById('urlInput').setAttribute('autocapitalize', 'none');
+    document.getElementById('urlInput').setAttribute('autocorrect', 'off');
+    document.getElementById('urlInput').setAttribute('spellcheck', 'false');
+
+    // Enter key
+    document.getElementById('urlInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') startCheck();
+    });
+  </script>
+
+</body>
+</html>
