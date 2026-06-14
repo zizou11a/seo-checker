@@ -32,7 +32,7 @@ const BLOCKED_HOSTS = /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])
 // ═══════════════════════════════════════════════
 function buildCors(env, requestOrigin) {
   // في حالة لم يُضبط ALLOWED_ORIGIN نقبل أي origin (مرحلة التطوير فقط)
-  const allowed = env?.ALLOWED_ORIGIN ?? '*';
+  const allowed = '*';
 
   // إذا كان مضبوطاً، نتحقق من المطابقة
   const originOk = allowed === '*' || requestOrigin === allowed;
