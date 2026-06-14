@@ -4,7 +4,7 @@ compatibility_date = "2024-01-01"
 
 # ── متغيرات البيئة ──
 [vars]
-ALLOWED_ORIGIN = "https://zizou11a.github.io"  # غيّر هذا لدومينك
+ALLOWED_ORIGIN = "*" # غيّر هذا لدومينك
 
 # ── KV Namespace للـ Rate Limiting ──
 # أنشئه أولاً: wrangler kv:namespace create SEO_RL
